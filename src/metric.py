@@ -17,8 +17,8 @@ class MyAccuracy(Metric):
 
      
         # [TODO] check if preds and target have equal shape
-        assert preds.shape == target.shape, "Predictions and targets must have the same shape"
-
+        assert preds_max_index.shape == target.shape, "preds_max_index and target must have the same shape"
+        
         # [TODO] Cound the number of correct prediction
         correct = torch.sum(preds_max_index == target)
  
