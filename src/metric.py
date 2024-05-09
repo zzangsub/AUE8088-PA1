@@ -13,14 +13,15 @@ class MyAccuracy(Metric):
 
     def update(self, preds, target):
         # [TODO] The preds (B x C tensor), so take argmax to get index with highest confidence
+        preds_max_index = torch.argmax(preds, dim=1)
 
-
+     
         # [TODO] check if preds and target have equal shape
-
+        assert preds.shape == target.shape, "Predictions and targets must have the same shape"
 
         # [TODO] Cound the number of correct prediction
-
-
+        correct = torch.sum(preds_max_index == target)
+ 
         # Accumulate to self.correct
         self.correct += correct
 
