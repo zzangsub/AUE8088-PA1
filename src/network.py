@@ -19,10 +19,56 @@ from src.util import show_setting
 
 # [TODO: Optional] Rewrite this class if you want
 class MyNetwork(AlexNet):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, num_classes=1000, dropout: float = 0.5):
 
         # [TODO] Modify feature extractor part in AlexNet
+        super(MyNetwork, self).__init__()
+        # Adjusting the convolutional layers
+        self.features = nn.Sequential(
+            # First conv layer with modified number of filters
+            # 3개의 입력을 받아 64개의 11x11필터를 사용하여 특징을 추출
+            # 스트라이드: 필터가 입력 데이터를 슬라이딩할 때, 필터가 얼마나 많은 픽셀을 건너뛰며 이동하는지를 나타내는 값 
+            # 예를 들어, 스트라이드가 1이면 필터는 입력 데이터를 한 픽셀씩 이동하면서 처리합. 스트라이드가 2라면 필터는 한 번에 두 픽셀씩 건너뛰며 이동. 
+            # 스트라이드가 커질수록 생성되는 특징 맵(feature map)의 크기는 작아짐.
+            # 패딩(Padding): 입력 데이터의 가장자리 주변에 특정 값(보통 0)을 추가하는 방법. 
+            # 이는 주로 입력 이미지의 공간적 크기를 유지하기 위해 사용, 필터가 데이터의 가장자리에서도 유효하게 작동할 수 있도록 도와줌. 
+            # 패딩을 사용하지 않는 경우(패딩=0, 'valid' 패딩), 컨볼루션 연산 후의 출력 크기는 입력 크기보다 작아짐. 
+            # 반면에 충분한 패딩을 사용하면(예: 'same' 패딩), 출력 크기가 입력 크기와 동일하게 유지될 수 있습니다.
+            nn.Conv2d(3, 64, kernel_size=8, stride=4, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.BatchNorm2d(64),  # Adding batch normalization
+
+            # Second conv layer
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.BatchNorm2d(192),  # Adding batch normalization
+
+            # Remaining layers following the typical AlexNet structure
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(384),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(256),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.BatchNorm2d(256)
+        )
+
+        # Adjusting the fully connected layers
+        self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
+        self.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes)
+        )
 
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

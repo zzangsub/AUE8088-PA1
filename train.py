@@ -30,12 +30,12 @@ if __name__ == "__main__":
         batch_size = cfg.BATCH_SIZE,
     )
 
-    # wandb_logger = WandbLogger(
-    #     project = cfg.WANDB_PROJECT,
-    #     save_dir = cfg.WANDB_SAVE_DIR,
-    #     entity = cfg.WANDB_ENTITY,
-    #     name = cfg.WANDB_NAME,
-    # )
+    wandb_logger = WandbLogger(
+        project = cfg.WANDB_PROJECT,
+        save_dir = cfg.WANDB_SAVE_DIR,
+        entity = cfg.WANDB_ENTITY,
+        name = cfg.WANDB_NAME,
+    )
 
     trainer = Trainer(
         accelerator = cfg.ACCELERATOR,
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         precision = cfg.PRECISION_STR,
         max_epochs = cfg.NUM_EPOCHS,
         check_val_every_n_epoch = cfg.VAL_EVERY_N_EPOCH,
-        # logger = wandb_logger,
+        logger = wandb_logger,
         callbacks = [
             LearningRateMonitor(logging_interval='epoch'),
             ModelCheckpoint(save_top_k=1, monitor='accuracy/val', mode='max'),
